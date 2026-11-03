@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Prova Prática Neuro</title>
+<style>
+:root {
+  --bg: #f4f2ee; --card: #ffffff; --ink: #1c2230; --muted: #667085; --line: #dcd8d0;
+  --accent: #2f5d8a; --accent-ink: #ffffff; --warn: #c27c0e; --over: #b42318;
+  --shadow: 0 1px 2px rgba(16,24,40,.06), 0 8px 24px rgba(16,24,40,.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171d; --card: #1d222b; --ink: #eef0f4; --muted: #9aa3b2; --line: #2e3542;
+    --accent: #6ea8e0; --accent-ink: #0d1520; --warn: #f0b44c; --over: #ff6b5e;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14171d; --card: #1d222b; --ink: #eef0f4; --muted: #9aa3b2; --line: #2e3542;
+  --accent: #6ea8e0; --accent-ink: #0d1520; --warn: #f0b44c; --over: #ff6b5e;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  min-height: 100vh; display: flex; flex-direction: column;
+}
+header, footer { padding: 14px clamp(16px, 4vw, 40px); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+header { justify-content: space-between; }
+.marca { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.marca b { color: var(--ink); font-weight: 650; }
+.restam { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.icone { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+.icone:hover { color: var(--ink); border-color: var(--muted); }
+main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 8px clamp(16px, 4vw, 40px) 24px; }
+
+/* tela inicial */
+#inicio { text-align: center; max-width: 640px; }
+#inicio h1 { font-size: clamp(28px, 4.4vw, 46px); line-height: 1.1; margin: 0 0 12px; letter-spacing: -.01em; }
+#inicio p { color: var(--muted); font-size: clamp(15px, 1.6vw, 18px); margin: 0 0 32px; line-height: 1.5; }
+.btn {
+  border: 0; border-radius: 14px; background: var(--accent); color: var(--accent-ink);
+  font: inherit; font-weight: 650; font-size: clamp(18px, 2vw, 22px); padding: 18px 40px; cursor: pointer;
+  box-shadow: var(--shadow); transition: transform .08s ease;
+}
+.btn:active { transform: scale(.98); }
+.btn.sec { background: var(--card); color: var(--ink); border: 1px solid var(--line); box-shadow: none; font-size: 16px; padding: 12px 22px; font-weight: 600; }
+.dica { margin-top: 18px; font-size: 13px; color: var(--muted); }
+kbd { font: inherit; font-size: 12px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; }
+
+/* sorteio */
+#roleta { display: none; text-align: center; }
+#roleta .n { font-size: clamp(120px, 22vw, 240px); font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1; color: var(--muted); }
+
+/* card sorteado */
+#prova { display: none; width: 100%; max-width: 1200px; }
+.grade { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); padding: clamp(20px, 3vw, 36px); }
+.card-topo { display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px; }
+.card-topo .rot { font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.card-topo .num { font-size: clamp(48px, 6vw, 72px); font-weight: 750; line-height: 1; font-variant-numeric: tabular-nums; }
+ol.tarefas { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+ol.tarefas li { display: grid; grid-template-columns: 44px 1fr; gap: 16px; align-items: start; padding: 18px 0 0; border-top: 1px solid var(--line); }
+ol.tarefas li:first-child { border-top: 0; padding-top: 0; }
+.bola { width: 44px; height: 44px; border-radius: 50%; background: var(--ink); color: var(--card); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; }
+.texto { font-size: clamp(19px, 2.1vw, 27px); line-height: 1.35; font-weight: 500; text-wrap: pretty; }
+
+.relogio { background: var(--card); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); padding: 24px; text-align: center; position: sticky; top: 16px; }
+.relogio .rot { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+#tempo { font-size: clamp(64px, 7vw, 92px); font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1.05; margin: 6px 0 14px; letter-spacing: -.02em; }
+.barra { height: 8px; border-radius: 8px; background: var(--line); overflow: hidden; margin-bottom: 20px; }
+.barra i { display: block; height: 100%; width: 100%; background: var(--accent); transform-origin: left; transition: transform .25s linear, background-color .3s; }
+.relogio.aviso #tempo { color: var(--warn); } .relogio.aviso .barra i { background: var(--warn); }
+.relogio.fim { border-color: var(--over); } .relogio.fim #tempo { color: var(--over); }
+.relogio.fim .barra i { background: var(--over); }
+#msgfim { display: none; font-weight: 700; color: var(--over); font-size: 18px; margin: -6px 0 14px; }
+.relogio.fim #msgfim { display: block; }
+.controles { display: grid; gap: 10px; }
+.controles .btn { width: 100%; padding: 16px; }
+.lado { display: flex; gap: 10px; } .lado .btn { flex: 1; }
+
+footer { justify-content: space-between; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); }
+footer form { display: flex; align-items: center; gap: 8px; }
+footer input { width: 64px; font: inherit; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+#historico { font-variant-numeric: tabular-nums; max-width: 60ch; }
+.link { background: none; border: 0; color: var(--muted); text-decoration: underline; font: inherit; cursor: pointer; padding: 0; }
+.link:hover { color: var(--ink); }
+
+@media (max-width: 860px) {
+  .grade { grid-template-columns: 1fr; }
+  .relogio { position: static; order: -1; }
+  ol.tarefas li { grid-template-columns: 34px 1fr; gap: 12px; }
+  .bola { width: 34px; height: 34px; font-size: 16px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="marca"><b>Prova prática</b> · Propedêutica neurológica</div>
+  <div style="display:flex;gap:12px;align-items:center">
+    <span class="restam" id="restam"></span>
+    <button class="icone" id="tela" title="Tela cheia">Tela cheia</button>
+  </div>
+</header>
+
+<main>
+  <section id="inicio">
+    <h1>Sorteie o seu card</h1>
+    <p>Cada card tem três tarefas de exame neurológico. Você terá <b>3 minutos</b> para cumprir as três, no colega ou explicando ao professor.</p>
+    <button class="btn" id="sortear">Sortear card</button>
+    <div class="dica">ou pressione <kbd>Enter</kbd></div>
+  </section>
+
+  <section id="roleta"><div class="n" id="roletaN">00</div></section>
+
+  <section id="prova">
+    <div class="grade">
+      <article class="card">
+        <div class="card-topo"><span class="rot">Card</span><span class="num" id="num"></span></div>
+        <ol class="tarefas" id="tarefas"></ol>
+      </article>
+      <aside class="relogio" id="relogio">
+        <div class="rot">Tempo</div>
+        <div id="tempo">3:00</div>
+        <div class="barra"><i id="barra"></i></div>
+        <div id="msgfim">Tempo esgotado</div>
+        <div class="controles">
+          <button class="btn" id="play">Iniciar</button>
+          <div class="lado">
+            <button class="btn sec" id="zerar">Reiniciar tempo</button>
+          </div>
+          <button class="btn sec" id="proximo">Próximo aluno</button>
+        </div>
+        <div class="dica"><kbd>Espaço</kbd> inicia/pausa</div>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>Sorteados: <span id="historico">nenhum</span></span>
+  <span style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+    <form id="abrir"><label for="abrirN">Abrir card nº</label><input id="abrirN" inputmode="numeric" autocomplete="off"></form>
+    <button class="link" id="reiniciar">Reiniciar baralho</button>
+  </span>
+</footer>
+
+<script>
+const CARDS = [{"n": 1, "tarefas": ["Diferencie, pelo exame físico, uma síndrome do NEURÔNIO MOTOR SUPERIOR de uma do NEURÔNIO MOTOR INFERIOR.", "Examine a MOTRICIDADE OCULAR EXTRÍNSECA (III, IV e VI pares) no seu colega.", "Como pesquisar HIPOTENSÃO ORTOSTÁTICA e qual o critério diagnóstico?"]}, {"n": 2, "tarefas": ["Pesquise no colega os SINAIS DE IRRITAÇÃO MENÍNGEA (rigidez de nuca, Kernig e Brudzinski).", "Examine a MÍMICA FACIAL (sétimo par) no seu colega.", "Quais REFLEXOS DE TRONCO você examina no paciente em coma e que nível cada um testa?"]}, {"n": 3, "tarefas": ["Demonstre no colega como pesquisar um NÍVEL SENSITIVO no tronco.", "Explique como avaliar a GUSTAÇÃO e quais nervos estão envolvidos.", "Faça a prova ÍNDEX-NARIZ no seu colega e explique o que observar."]}, {"n": 4, "tarefas": ["Avalie a sensibilidade VIBRATÓRIA e a PROPRIOCEPÇÃO (cinético-postural) do seu colega.", "Pesquise no colega os reflexos FOTOMOTOR DIRETO e CONSENSUAL e explique as vias.", "Diferencie VERTIGEM de TONTURA e cite as diferenças de exame entre vertigem PERIFÉRICA e CENTRAL."]}, {"n": 5, "tarefas": ["Explique como fazer o teste do MONOFILAMENTO no pé e o que um teste alterado significa.", "Examine o PALATO e a ÚVULA do seu colega e explique o reflexo nauseoso.", "Cite e explique os SINAIS DE UMA SÍNDROME CEREBELAR no exame físico (pelo menos cinco)."]}, {"n": 6, "tarefas": ["Explique como avaliar o TROFISMO muscular e o que significam atrofia e fasciculações.", "Avalie a AUDIÇÃO do seu colega à beira do leito, sem instrumentos.", "Demonstre no colega a prova do REBOTE (Stewart-Holmes) e explique o reflexo PENDULAR."]}, {"n": 7, "tarefas": ["Descreva os achados de exame da síndrome de BROWN-SÉQUARD (hemissecção medular).", "Avalie a porção MOTORA do trigêmeo no colega e pesquise o reflexo MANDIBULAR.", "Pesquise NISTAGMO no seu colega e explique como descrevê-lo."]}, {"n": 8, "tarefas": ["Avalie o TÔNUS muscular do seu colega e explique as alterações possíveis.", "Diferencie a PARALISIA FACIAL CENTRAL da PERIFÉRICA.", "Demonstre no colega a manobra de EPLEY, explicando cada passo."]}, {"n": 9, "tarefas": ["Pesquise os reflexos BICIPITAL e TRICIPITAL no seu colega e gradue a resposta.", "Como diferenciar diplopia MONOCULAR de BINOCULAR? Depois, pesquise no colega o reflexo de ACOMODAÇÃO-CONVERGÊNCIA.", "Descreva as POSTURAS motoras anormais do paciente em coma (decorticação e descerebração)."]}, {"n": 10, "tarefas": ["Avalie a sensibilidade VIBRATÓRIA e a PROPRIOCEPÇÃO (cinético-postural) do seu colega.", "Explique como pesquisar o reflexo CORNEOPALPEBRAL e quais são as suas vias.", "Faça o HEAD IMPULSE TEST (impulso cefálico) no seu colega e interprete."]}, {"n": 11, "tarefas": ["Explique como avaliar o TROFISMO muscular e o que significam atrofia e fasciculações.", "Examine a MOTRICIDADE OCULAR EXTRÍNSECA (III, IV e VI pares) no seu colega.", "Pesquise a DIADOCOCINESIA no seu colega e explique o que é disdiadococinesia."]}, {"n": 12, "tarefas": ["Pesquise o reflexo CUTÂNEO-PLANTAR no seu colega e explique o sinal de Babinski.", "Pesquise no colega os reflexos FOTOMOTOR DIRETO e CONSENSUAL e explique as vias.", "Explique a PROVA CALÓRICA e o que se espera no paciente acordado e no paciente em coma."]}, {"n": 13, "tarefas": ["Explique como avaliar a FORÇA muscular de uma pessoa e como graduá-la.", "Examine as PUPILAS do seu colega e explique a síndrome de Claude Bernard-Horner.", "Pesquise a DIADOCOCINESIA no seu colega e explique o que é disdiadococinesia."]}, {"n": 14, "tarefas": ["Descreva os achados de exame da síndrome de BROWN-SÉQUARD (hemissecção medular).", "Examine as PUPILAS do seu colega e explique a síndrome de Claude Bernard-Horner.", "Faça a prova CALCANHAR-JOELHO no seu colega."]}, {"n": 15, "tarefas": ["Pesquise os reflexos PATELAR e AQUILEU no seu colega.", "Examine o NERVO HIPOGLOSSO (décimo segundo par) no seu colega.", "Quais REFLEXOS DE TRONCO você examina no paciente em coma e que nível cada um testa?"]}, {"n": 16, "tarefas": ["Pesquise o reflexo CUTÂNEO-PLANTAR no seu colega e explique o sinal de Babinski.", "Explique como fazer a FUNDOSCOPIA e o que deve ser observado.", "Demonstre no colega a prova dos BRAÇOS ESTENDIDOS e a MARCHA de olhos fechados (função vestibular)."]}, {"n": 17, "tarefas": ["Como diferenciar, pelo exame, a fase de CHOQUE MEDULAR da fase crônica de uma lesão medular?", "Como avaliar DISFAGIA e DISFONIA na anamnese e no exame físico (nono e décimo pares)?", "Faça a prova ÍNDEX-NARIZ no seu colega e explique o que observar."]}, {"n": 18, "tarefas": ["Como diferenciar, pelo exame, a fase de CHOQUE MEDULAR da fase crônica de uma lesão medular?", "Como diferenciar diplopia MONOCULAR de BINOCULAR? Depois, pesquise no colega o reflexo de ACOMODAÇÃO-CONVERGÊNCIA.", "Avalie o TREMOR no seu colega: como diferenciar tremor de REPOUSO de tremor de AÇÃO?"]}, {"n": 19, "tarefas": ["Explique como fazer o teste do MONOFILAMENTO no pé e o que um teste alterado significa.", "Explique como avaliar a ACUIDADE VISUAL e a VISÃO DE CORES.", "Avalie a MARCHA do seu colega e faça o PULL TEST."]}, {"n": 20, "tarefas": ["Explique o que é CLÔNUS e demonstre no colega como pesquisar o clônus aquileu.", "Explique o que é uma SÍNDROME ALTERNA (cruzada) e dê um exemplo a partir do exame.", "Faça a manobra de DIX-HALLPIKE no seu colega."]}, {"n": 21, "tarefas": ["Avalie a sensibilidade TÁTIL e DOLOROSA nos membros inferiores do seu colega.", "Como avaliar o TERCEIRO PAR craniano (oculomotor)? Quais os achados na paralisia completa?", "Faça a prova CALCANHAR-JOELHO no seu colega."]}, {"n": 22, "tarefas": ["Explique como fazer o teste do MONOFILAMENTO no pé e o que um teste alterado significa.", "Como avaliar DISFAGIA e DISFONIA na anamnese e no exame físico (nono e décimo pares)?", "Pesquise RIGIDEZ e BRADICINESIA no seu colega, como faria num paciente com parkinsonismo."]}, {"n": 23, "tarefas": ["Diferencie, pelo exame físico, uma síndrome do NEURÔNIO MOTOR SUPERIOR de uma do NEURÔNIO MOTOR INFERIOR.", "Avalie a SENSIBILIDADE DA FACE (trigêmeo) no seu colega.", "Faça a manobra de DIX-HALLPIKE no seu colega."]}, {"n": 24, "tarefas": ["Diferencie ESPASTICIDADE de RIGIDEZ no exame do tônus.", "Descreva os achados da paralisia do QUARTO PAR (troclear) e do SEXTO PAR (abducente).", "Avalie a MARCHA do seu colega, incluindo a marcha em TANDEM, e descreva a marcha atáxica cerebelar."]}, {"n": 25, "tarefas": ["Faça no seu colega o exame de FORÇA dos membros inferiores (proximal e distal).", "Avalie a porção MOTORA do trigêmeo no colega e pesquise o reflexo MANDIBULAR.", "Cite e explique os SINAIS DE UMA SÍNDROME CEREBELAR no exame físico (pelo menos cinco)."]}, {"n": 26, "tarefas": ["Diferencie, pelo exame físico, uma síndrome do NEURÔNIO MOTOR SUPERIOR de uma do NEURÔNIO MOTOR INFERIOR.", "Examine o NERVO HIPOGLOSSO (décimo segundo par) no seu colega.", "Demonstre no colega a manobra de EPLEY, explicando cada passo."]}, {"n": 27, "tarefas": ["Avalie o TÔNUS muscular do seu colega e explique as alterações possíveis.", "Examine o NERVO ACESSÓRIO (décimo primeiro par) no seu colega.", "Descreva as POSTURAS motoras anormais do paciente em coma (decorticação e descerebração)."]}, {"n": 28, "tarefas": ["Pesquise no colega os SINAIS DE IRRITAÇÃO MENÍNGEA (rigidez de nuca, Kernig e Brudzinski).", "Como avaliar o PRIMEIRO PAR craniano (olfatório)?", "Pesquise RIGIDEZ e BRADICINESIA no seu colega, como faria num paciente com parkinsonismo."]}, {"n": 29, "tarefas": ["Faça a prova de ROMBERG no seu colega e explique a interpretação.", "Explique como fazer a FUNDOSCOPIA e o que deve ser observado.", "Pesquise NISTAGMO no seu colega e explique como descrevê-lo."]}, {"n": 30, "tarefas": ["Faça a prova de ROMBERG no seu colega e explique a interpretação.", "Explique como pesquisar o reflexo CORNEOPALPEBRAL e quais são as suas vias.", "Avalie o TREMOR no seu colega: como diferenciar tremor de REPOUSO de tremor de AÇÃO?"]}, {"n": 31, "tarefas": ["Faça a prova de ROMBERG no seu colega e explique a interpretação.", "Examine a MÍMICA FACIAL (sétimo par) no seu colega.", "Diferencie COMA, ESTADO VEGETATIVO e SÍNDROME DO ENCARCERAMENTO (locked-in) pelo exame."]}, {"n": 32, "tarefas": ["Faça no seu colega o exame de FORÇA dos membros inferiores (proximal e distal).", "Diferencie a PARALISIA FACIAL CENTRAL da PERIFÉRICA.", "Explique a PROVA CALÓRICA e o que se espera no paciente acordado e no paciente em coma."]}, {"n": 33, "tarefas": ["Demonstre no colega como pesquisar um NÍVEL SENSITIVO no tronco.", "Como avaliar o TERCEIRO PAR craniano (oculomotor)? Quais os achados na paralisia completa?", "Demonstre no colega a prova dos BRAÇOS ESTENDIDOS e a MARCHA de olhos fechados (função vestibular)."]}, {"n": 34, "tarefas": ["Diferencie ESPASTICIDADE de RIGIDEZ no exame do tônus.", "Avalie o CAMPO VISUAL do seu colega por confrontação.", "Faça o HEAD IMPULSE TEST (impulso cefálico) no seu colega e interprete."]}, {"n": 35, "tarefas": ["Pesquise o reflexo CUTÂNEO-PLANTAR no seu colega e explique o sinal de Babinski.", "Explique o que é uma SÍNDROME ALTERNA (cruzada) e dê um exemplo a partir do exame.", "Explique a ESCALA DE COMA DE GLASGOW: componentes e pontuação."]}, {"n": 36, "tarefas": ["Avalie a sensibilidade TÁTIL e DOLOROSA nos membros inferiores do seu colega.", "Examine o PALATO e a ÚVULA do seu colega e explique o reflexo nauseoso.", "Diferencie COMA, ESTADO VEGETATIVO e SÍNDROME DO ENCARCERAMENTO (locked-in) pelo exame."]}, {"n": 37, "tarefas": ["Explique o padrão sensitivo \"EM BOTA E LUVA\" e como o exame o diferencia de uma lesão medular.", "Avalie o CAMPO VISUAL do seu colega por confrontação.", "Demonstre no colega a pesquisa do reflexo OCULOCEFÁLICO (\"olhos de boneca\") e explique a interpretação."]}, {"n": 38, "tarefas": ["Explique como avaliar o TROFISMO muscular e o que significam atrofia e fasciculações.", "Explique como avaliar a ACUIDADE VISUAL e a VISÃO DE CORES.", "Avalie a MARCHA do seu colega, incluindo a marcha em TANDEM, e descreva a marcha atáxica cerebelar."]}, {"n": 39, "tarefas": ["Pesquise os reflexos PATELAR e AQUILEU no seu colega.", "Descreva os achados da paralisia do QUARTO PAR (troclear) e do SEXTO PAR (abducente).", "Como avaliar as PUPILAS de um paciente em coma e o que cada achado sugere?"]}, {"n": 40, "tarefas": ["Explique como avaliar a FORÇA muscular de uma pessoa e como graduá-la.", "Examine o NERVO ACESSÓRIO (décimo primeiro par) no seu colega.", "Diferencie VERTIGEM de TONTURA e cite as diferenças de exame entre vertigem PERIFÉRICA e CENTRAL."]}, {"n": 41, "tarefas": ["Demonstre no colega como pesquisar um NÍVEL SENSITIVO no tronco.", "Faça as provas de RINNE e WEBER no seu colega e explique a interpretação.", "Como avaliar as PUPILAS de um paciente em coma e o que cada achado sugere?"]}, {"n": 42, "tarefas": ["Explique o que é CLÔNUS e demonstre no colega como pesquisar o clônus aquileu.", "Como avaliar o PRIMEIRO PAR craniano (olfatório)?", "Demonstre no colega a prova do REBOTE (Stewart-Holmes) e explique o reflexo PENDULAR."]}, {"n": 43, "tarefas": ["Faça no seu colega o exame de FORÇA dos membros inferiores (proximal e distal).", "Faça as provas de RINNE e WEBER no seu colega e explique a interpretação.", "Explique a ESCALA DE COMA DE GLASGOW: componentes e pontuação."]}, {"n": 44, "tarefas": ["Explique o padrão sensitivo \"EM BOTA E LUVA\" e como o exame o diferencia de uma lesão medular.", "Avalie a SENSIBILIDADE DA FACE (trigêmeo) no seu colega.", "Explique o TESTE HINTS e como ele diferencia uma causa central de uma periférica."]}, {"n": 45, "tarefas": ["Pesquise os reflexos BICIPITAL e TRICIPITAL no seu colega e gradue a resposta.", "Avalie a AUDIÇÃO do seu colega à beira do leito, sem instrumentos.", "Explique o TESTE HINTS e como ele diferencia uma causa central de uma periférica."]}];
+const DURACAO = 180;            // segundos
+const AVISO = 30;               // fica âmbar nos últimos 30 s
+const CHAVE = "prova-neuro-baralho-v1";
+const $ = id => document.getElementById(id);
+
+// ---------- baralho: sorteio sem repetição, guardado no navegador
+function embaralhar(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function novoBaralho() { return { restantes: embaralhar(CARDS.map(c => c.n)), sorteados: [] }; }
+let estado;
+try { estado = JSON.parse(localStorage.getItem(CHAVE)); } catch (e) { estado = null; }
+if (!estado || !Array.isArray(estado.restantes) || !Array.isArray(estado.sorteados)) estado = novoBaralho();
+function salvar() { try { localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch (e) {} }
+function atualizarRodape() {
+  $("restam").textContent = `Restam ${estado.restantes.length} de ${CARDS.length} cards`;
+  $("historico").textContent = estado.sorteados.length ? estado.sorteados.map(n => String(n).padStart(2, "0")).join(" · ") : "nenhum";
+}
+
+// ---------- telas
+function mostrar(id) { for (const s of ["inicio", "roleta", "prova"]) $(s).style.display = s === id ? "block" : "none"; }
+mostrar("inicio");
+let tela = "inicio";
+
+function sortear() {
+  if (tela === "roleta") return;
+  if (!estado.restantes.length) { estado.restantes = embaralhar(CARDS.map(c => c.n)); }
+  const n = estado.restantes.pop();
+  estado.sorteados.push(n); salvar(); atualizarRodape();
+  tela = "roleta"; mostrar("roleta"); pararRelogio(); zerarRelogio();
+  const t0 = performance.now(), dur = 1400;
+  (function girar(t) {
+    const p = (t - t0) / dur;
+    if (p < 1) {
+      $("roletaN").textContent = String(1 + Math.floor(Math.random() * CARDS.length)).padStart(2, "0");
+      setTimeout(() => requestAnimationFrame(girar), 40 + p * p * 160);
+    } else abrirCard(n);
+  })(t0);
+}
+
+function abrirCard(n) {
+  const c = CARDS.find(c => c.n === n); if (!c) return;
+  $("num").textContent = String(n).padStart(2, "0");
+  $("tarefas").innerHTML = "";
+  c.tarefas.forEach((t, i) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<div class="bola">${i + 1}</div><div class="texto"></div>`;
+    li.querySelector(".texto").textContent = t;
+    $("tarefas").appendChild(li);
+  });
+  tela = "prova"; mostrar("prova"); zerarRelogio();
+}
+
+// ---------- relógio
+let restante = DURACAO, rodando = false, alvo = 0, tique = null, apitou = false, audio = null;
+function fmt(s) { s = Math.max(0, Math.ceil(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }
+function desenhar() {
+  $("tempo").textContent = fmt(restante);
+  $("barra").style.transform = `scaleX(${Math.max(0, restante) / DURACAO})`;
+  const r = $("relogio");
+  r.classList.toggle("aviso", restante > 0 && restante <= AVISO);
+  r.classList.toggle("fim", restante <= 0);
+  $("play").textContent = rodando ? "Pausar" : (restante < DURACAO && restante > 0 ? "Continuar" : "Iniciar");
+  $("play").disabled = restante <= 0;
+  $("play").style.opacity = restante <= 0 ? .4 : 1;
+}
+function iniciar() {
+  if (restante <= 0) return;
+  garantirAudio();
+  rodando = true; alvo = performance.now() + restante * 1000;
+  clearInterval(tique); tique = setInterval(passo, 100); desenhar();
+}
+function passo() {
+  restante = (alvo - performance.now()) / 1000;
+  if (restante <= 0) { restante = 0; pararRelogio(); if (!apitou) { apitou = true; apito(); } }
+  desenhar();
+}
+function pararRelogio() { rodando = false; clearInterval(tique); desenhar(); }
+function zerarRelogio() { pararRelogio(); restante = DURACAO; apitou = false; desenhar(); }
+function alternar() { rodando ? (passo(), pararRelogio()) : iniciar(); }
+
+function garantirAudio() {
+  try { if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)(); if (audio.state === "suspended") audio.resume(); } catch (e) {}
+}
+function apito() {
+  if (!audio) return;
+  [0, .45, .9].forEach(d => {
+    const o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime + d;
+    o.type = "sine"; o.frequency.value = 880;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.5, t + .02); g.gain.exponentialRampToValueAtTime(0.0001, t + .35);
+    o.connect(g).connect(audio.destination); o.start(t); o.stop(t + .4);
+  });
+}
+
+// ---------- eventos
+$("sortear").onclick = () => { garantirAudio(); sortear(); };
+$("play").onclick = alternar;
+$("zerar").onclick = zerarRelogio;
+$("proximo").onclick = () => { pararRelogio(); tela = "inicio"; mostrar("inicio"); };
+$("reiniciar").onclick = () => {
+  if (confirm("Reiniciar o baralho? Todos os cards voltam a poder ser sorteados e o histórico é apagado.")) {
+    estado = novoBaralho(); salvar(); atualizarRodape(); pararRelogio(); tela = "inicio"; mostrar("inicio");
+  }
+};
+$("abrir").onsubmit = e => {
+  e.preventDefault();
+  const n = parseInt($("abrirN").value, 10);
+  if (CARDS.some(c => c.n === n)) { abrirCard(n); $("abrirN").value = ""; $("abrirN").blur(); }
+  else alert(`Não existe card nº ${$("abrirN").value}. Os cards vão de 1 a ${CARDS.length}.`);
+};
+$("tela").onclick = () => { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); };
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT") return;
+  if (e.code === "Space" && tela === "prova") { e.preventDefault(); alternar(); }
+  else if (e.key === "Enter" && tela === "inicio") { e.preventDefault(); garantirAudio(); sortear(); }
+});
+atualizarRodape(); desenhar();
+</script>
+</body>
+</html>
